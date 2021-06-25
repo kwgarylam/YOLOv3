@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('tm_01.mp4')
 whT = 320
 confThreshold = 0.5
 # The lower the value, the more aggressive, less boxes will be
@@ -16,8 +16,8 @@ with open(classesFile, 'rt') as f:
 #print(classNames)
 #print(len(classNames))
 
-modelConfiguration = 'yolov3-tiny.cfg'
-modelWeights = 'yolov3-tiny.weights'
+modelConfiguration = 'yolov3.cfg'
+modelWeights = 'yolov3.weights'
 
 net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
@@ -58,9 +58,13 @@ def findObjects(outputs, img):
         i = i[0]
         box = bbox[i]
         x,y,w,h = box[0], box[1], box[2], box[3]
-        cv2.rectangle(img, (x,y), (x+w, y+h), (255,0,255), 2)
+        np.random.seed(42)
+        COLORS = np.random.randint(0, 255, size=(80, 3), dtype="uint8")
+        print(COLORS)
+        color = [int(c) for c in COLORS[classIds[i]]]
+        cv2.rectangle(img, (x,y), (x+w, y+h), color, 2)
         cv2.putText(img, f'{classNames[classIds[i]].upper()} {int(confidences[i]*100)}%',
-                    (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,0,255), 2)
+                    (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
 
 while True:
